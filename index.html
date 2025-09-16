@@ -1,82 +1,32 @@
+<!DOCTYPE html>
+
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <title>Panic Chat</title>
-        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-      
-    </head>
-    <body class="overflow-scroll">
-        
-        <header class="w-screen h-[60px] bg-black fixed flex items-center px-6 justify-between">
-            <div class="user-select w-[142px] h-[75%] border-1 border-white box-sizing rounded-3xl" onclick="userSwitch()">
-                <div id="user-pointer" class="pointer w-[70px] h-full bg-[#25d366] rounded-3xl translate-x-full cursor-pointer transition-transform duration-300 linear"></div>
-            </div>
-            <div class="open-keyboard w-[65px] flex items-center justify-center h-[80%] cursor-pointer bg-black border-1 border-white rounded-3xl" onclick="openKeyboard()">
-                <i class="fa-solid fa-comments text-3xl" style="color: #ffffff;"></i>
-            </div>
-        </header>
-        <main class="bg-[#22272e] min-h-screen pt-[50px]">
-            <div id="chat-container" class="w-screen py-1 flex flex-col gap-1">
-                <input id="input" type="text" class="opacity-0">
-                <div id="chat-node" class="mx-[16px] chats px-1 rounded-2xl bg-[#25d366] w-fit self-end transition-opacity duration-300 ease-in-out">...</div>
-                
-            </div>
-        </main>
-        
-        <div id="unrecorded-class" class="opacity-0 translate-x-full self-end"></div>
-        
-<script>
-let pointer = document.getElementById("user-pointer")
-let chatContainer = document.getElementById("chat-container")
-let input = document.getElementById("input")
-let chatNode = document.getElementById('chat-node')
-
-let isUser1 = false
-function userSwitch(){
-    input.focus()
-    isUser1 = !isUser1
-    
-    chatNode.classList.add("opacity-0")
-    setTimeout(()=>{
-        chatNode.classList.remove("opacity-0")
-        
-        if(isUser1){
-        pointer.classList.remove("translate-x-full")
-        chatNode.classList.remove("self-end")
-        return}
-        
-        pointer.classList.add("translate-x-full")
-        chatNode.classList.add("self-end")
-    },300)
-    
-}
-
-function openKeyboard(){input.focus()}
-
-        
-function enterHandler(){
-    const newChat = chatNode.cloneNode(true)
-    newChat.id = ""
-    chatContainer.insertBefore(newChat, chatNode)
-}
-
-document.addEventListener("keydown", e => {
-    if(e.key === "Enter" && input.value.trim()){
-        enterHandler()
-        input.value = ""
-        chatNode.textContent = "..."
-    }
-    if(e.key === "Tab"){
-        e.preventDefault()
-        userSwitch()
-    }
-})
-
-input.addEventListener("input", () => {
-    chatNode.textContent = input.value.trim()? input.value : "..."
-}) 
-</script>
-    </body>
+<head>
+ <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+ <title>Hello, World!</title>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+ <a id="link">loading..</a>
+ <script>
+  const dataUrl = "https://docs.google.com/spreadsheets/d/1GK_p8hqGwqFUj0Yap49wOq8rnUgzwBvIgtwf8tErBFg/export?format=csv" + "&_=" + Date.now()
+  let data, errorMessage
+ const link = document.getElementById("link")
+ async function main(){
+  try{
+    const response = await fetch(dataUrl)
+    data = await response.text()
+    data = Papa.parse(data).data[0]
+    link.textContent = data[0]
+   link.href = data[1]
+  } catch{
+   data = "error"
+  }
+ }
+ main()
+  
+ 
+ </script>
+  
+</body>
 </html>
