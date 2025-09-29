@@ -18,7 +18,8 @@
     header {
       background: #4CAF50;
       color: white;
-      padding: 15px;
+      padding: 10px 0px;
+      margin: 0;
       text-align: center;
     }
     .container {
@@ -29,7 +30,7 @@
       border-radius: 5px;
     }
     h1 {
-      margin-top: 0;
+      margin: 0;
     }
     ul {
       list-style: none;
@@ -56,6 +57,10 @@
     button:hover {
       background: #45a049;
     }
+    h3 {
+     width: 100%;
+     text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -65,7 +70,9 @@
 
   <div class="container">
    
-    <ul id="dataList">
+   <h3 id="log">Loading...</h3>
+   
+    <ul id="list-data">
       <!-- JS will clone and fill <li> items here -->
       <li id="list-node" hidden="true">
         <span>Example link</span><br>
@@ -75,8 +82,11 @@
   </div>
  <script>
  const dataUrl = "https://docs.google.com/spreadsheets/d/1GK_p8hqGwqFUj0Yap49wOq8rnUgzwBvIgtwf8tErBFg/export?format=csv" + "&_=" + Date.now()
-  let datas, errorMessage
- const list = document.getElementById("list-node")
+ let datas, errorMessage
+ const list = document.getElementById("list-data")
+ const listNode = document.getElementById("list-node")
+ const fragment = document.createDocumentFragment()
+ const log = document.getElementById("log")
  
  async function main(){
   try{
@@ -84,8 +94,7 @@
     datas = await response.text()
     datas = Papa.parse(datas).data
     datas.forEach(data => {
-     const newEl = list.cloneNode(true)
-     console.log(newEl)
+     const newEl = listNode.cloneNode(true)
      newEl.children[0].textContent = data[0]
      if(data[1].includes("http")){
       newEl.children[2].textContent = "open"
@@ -95,12 +104,13 @@
        navigator.clipboard.writeText(data[1]).then(()=>{alert("copied")}).catch(()=>{alert("failed to copy")})
       }
      }
-     //newEl.children[1] = data[1]
      newEl.hidden = false
-     document.body.appendChild(newEl)
+     fragment.appendChild(newEl)
     })
+   log.textContent = "Done"
+   setTimeout(()=>{list.appendChild(fragment); log.remove()}, 1000)
   } catch{
-   document.getElementById("title").textContent = 'error'
+   log.textContent = 'error'
   }
  }
  main()
