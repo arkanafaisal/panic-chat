@@ -1,119 +1,86 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fast Data</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-      overflow-x: hidden;
-      background: #f4f4f4;
-      color: #333;
-    }
-    header {
-      background: #4CAF50;
-      color: white;
-      padding: 10px 0px;
-      margin: 0;
-      text-align: center;
-    }
-    .container {
-      width: 80vw;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 10px;
-      border-radius: 5px;
-    }
-    h1 {
-      margin: 0;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    li {
-      background: #fafafa;
-      border: 1px solid #ddd;
-      padding: 10px;
-      margin-bottom: 5px;
-      border-radius: 3px;
-    }
-    button {
-      display: inline-block;
-      padding: 6px 12px;
-      background: #4CAF50;
-      border: none;
-      color: white;
-      margin-top: 5px;
-      text-decoration: none;
-      border-radius: 3px;
-      font-size: 14px;
-    }
-    button:hover {
-      background: #45a049;
-    }
-    h3 {
-     width: 100%;
-     text-align: center;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1 id="title">Fast Data</h1>
-  </header>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <title>Panic Chat</title>
+        <link rel="stylesheet" href="css/output.css">
+        <style>
 
-  <div class="container">
-   
-   <h3 id="log">Loading...</h3>
-   
-    <ul id="list-data">
-      <!-- JS will clone and fill <li> items here -->
-      <li id="list-node" hidden="true">
-        <span>Example link</span><br>
-        <button>Copy</button>
-      </li>
-    </ul>
-  </div>
- <script>
- const dataUrl = "https://docs.google.com/spreadsheets/d/1GK_p8hqGwqFUj0Yap49wOq8rnUgzwBvIgtwf8tErBFg/export?format=csv" + "&_=" + Date.now()
- let datas, errorMessage
- const list = document.getElementById("list-data")
- const listNode = document.getElementById("list-node")
- const fragment = document.createDocumentFragment()
- const log = document.getElementById("log")
- 
- async function main(){
-  try{
-    const response = await fetch(dataUrl)
-    datas = await response.text()
-    datas = Papa.parse(datas).data
-    datas.forEach(data => {
-     const newEl = listNode.cloneNode(true)
-     newEl.children[0].textContent = data[0]
-     if(data[1].includes("http")){
-      newEl.children[2].textContent = "open"
-      newEl.children[2].onclick = ()=>{window.location.href=data[1]}
-     } else {
-      newEl.children[2].onclick = ()=>{
-       navigator.clipboard.writeText(data[1]).then(()=>{alert("copied")}).catch(()=>{alert("failed to copy")})
-      }
-     }
-     newEl.hidden = false
-     fragment.appendChild(newEl)
-    })
-   log.textContent = "Done"
-   setTimeout(()=>{list.appendChild(fragment); log.remove()}, 1000)
-  } catch{
-   log.textContent = 'error'
-  }
- }
- main()
- </script>
-</body>
+        </style>
+    </head>
+    <body class="bg-[#22272e]">
+        
+        <header class="bg-[#1a1d23] h-14 py-2 w-full fixed top-0 left-0 flex items-center justify-around">
+            <div id="user-select" class="w-32 h-10 border-1 box-sizing border-white rounded-full flex flex-col" onclick="userSwitch()">
+                <div id="user-pointer" class="w-[55%] h-full rounded-full bg-[#25d366] self-end transition-all linear duration-100"></div>
+            </div>
+            <button class="h-full px-3 flex items-center text-4xl text-white bg-black rounded-full " onclick="openKeyboard()">
+                <i class="fa-solid fa-comments"></i>
+            </button>
+        </header>
+        <main class="min-h-[50vh] mt-14">
+            <div id="chat-container" class="flex flex-col gap-2 px-2 py-3 ">
+                <div id="chat-node" class="box-border p-1 w-fit max-w-[70%] h-auto bg-[#25d366] rounded-2xl text-center self-end font-sans">...</div>
+                <input id="input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="appearance-none border-none outline-none bg-transparent shadow-none text-[#22272e]">
+            </div>
+        </main>
+
+        <script>
+let vh = window.innerHeight * 0.01
+document.documentElement.style.setProperty("--vh", vh + "px")
+
+
+let userSelector = document.getElementById("user-select")
+let pointer = document.getElementById("user-pointer")
+let chatContainer = document.getElementById("chat-container")
+let chats = document.getElementsByClassName("chats")
+let chatNode = document.getElementById("chat-node")
+let input = document.getElementById("input")
+
+let side = 2
+function userSwitch(){
+    side = side === 2? 1 : 2
+    if(side === 2){
+        pointer.classList.add("self-end")
+        chatNode.classList.add("self-end")
+    }
+    else{
+        pointer.classList.remove("self-end")
+        chatNode.classList.remove("self-end")
+    }
+
+    openKeyboard()
+}
+function openKeyboard(){
+    input.focus()
+}
+        
+function enterHandler(input){
+    const newChat = chatNode.cloneNode()
+    newChat.innerText = input
+    chatContainer.insertBefore(newChat, chatNode)
+}
+
+document.addEventListener("keydown", e => {
+    if(e.key === "Enter" && input.value.trim()){
+        enterHandler(input.value)
+        input.value = ""
+        chatNode.innerText = "..."
+    }
+    if(e.key === "Tab"){
+        e.preventDefault()
+        userSwitch()
+    }
+})
+input.addEventListener("input", e =>{
+    const inputvalue = input.value
+    if(inputvalue.trim() === ""){
+        input.value = ""
+        chatNode.innerText = "..."
+    }
+    chatNode.innerText = inputvalue
+})
+        </script>
+    </body>
 </html>
